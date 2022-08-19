@@ -185,11 +185,11 @@ int fstatat(int dirfd, const char *pathname, struct stat *buf,
 	int error, ret;
 
 	if (dirfd == AT_FDCWD || pathname[0]=='/' || pathname[1]==':')
-		return fstat(pathname, buf);
+		return stat(pathname, buf);
 
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
-	ret = fstat(proc_file, buf);
+	ret = stat(proc_file, buf);
 	free (proc_file);
 	return (ret);
 
