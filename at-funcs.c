@@ -83,6 +83,7 @@ int openat(int dirfd, const char *pathname, int flags, mode_t mode)
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
 	ret = open(proc_file, flags, mode);
+	free (proc_file);
 	return (ret);
 }
 
@@ -103,6 +104,7 @@ unlinkat(int dirfd, const char *pathname, int flags)
 	else
 		ret = unlink(proc_file);
 
+	free (proc_file);
 	return (ret);
 }
 
@@ -120,6 +122,8 @@ renameat(int fromfd, const char *from, int tofd, const char *to)
 	char *to_file = openat_proc_name (to_buf, tofd, to);
 
 	ret = rename(from_file, to_file);
+	free (from_file);
+	free (to_file);
 	return (ret);
 }
 
@@ -134,10 +138,10 @@ symlinkat(const char *from, int tofd, const char *to)
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, tofd, to);
 	ret = symlink(from, proc_file);
+	free (proc_file);
 	return (ret);
 }
 
-//up to here
 int mkdirat(int dirfd, const char *pathname, mode_t mode)
 {
 	int error, ret;
@@ -148,6 +152,7 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
 	ret = mkdir(proc_file, mode);
+	free (proc_file);
 	return (ret);
 }
 
@@ -163,6 +168,7 @@ ssize_t readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz)
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
 	ret = readlink(proc_file, buf, bufsiz);
+	free (proc_file);
 	return (ret);
 }
 
@@ -171,6 +177,35 @@ int linkat(int olddirfd, const char *oldpath,
 {
 	return ENOTSUP;
 }
+
+int fstatat(int dirfd, const char *pathname, struct stat *buf,
+            int flags)
+{
+	/* @TODO - handle flags */
+	int error, ret;
+
+	if (dirfd == AT_FDCWD || pathname[0]=='/' || pathname[1]==':')
+		return fstat(pathname, buf);
+
+	char proc_buf[OPENAT_BUFFER_SIZE];
+	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
+	ret = fstat(proc_file, buf);
+	free (proc_file);
+	return (ret);
+
+}
+
+int utimensat(int dirfd, const char *pathname,
+              const struct timespec times[2], int flags)
+{
+
+}
+
+int futimens(int fd, const struct timespec times[2])
+{
+
+}
+
 
 #if 0
 int main() {
