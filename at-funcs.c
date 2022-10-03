@@ -86,6 +86,8 @@ int openat(int dirfd, const char *pathname, int flags, mode_t mode)
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
 	ret = open(proc_file, flags, mode);
+        if (proc_file != proc_buf)
+          free (proc_file);
 	return (ret);
 }
 
@@ -99,6 +101,8 @@ unlinkat(int dirfd, const char *pathname, int flags)
 
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
+        if (proc_file != proc_buf)
+          free (proc_file);
 
 
 	if (flags == AT_REMOVEDIR)
@@ -123,6 +127,10 @@ renameat(int fromfd, const char *from, int tofd, const char *to)
 	char *to_file = openat_proc_name (to_buf, tofd, to);
 	unlink(to_file);
 	ret = rename(from_file, to_file);
+        if (from_file != from_buf)
+          free (from_file);
+        if (to_file != to_buf)
+          free (to_file);
 	return (ret);
 }
 
@@ -137,6 +145,8 @@ symlinkat(const char *from, int tofd, const char *to)
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, tofd, to);
 	ret = symlink(from, proc_file);
+        if (proc_file != proc_buf)
+          free (proc_file);
 	return (ret);
 }
 
@@ -150,6 +160,8 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
 	ret = mkdir(proc_file, mode);
+        if (proc_file != proc_buf)
+          free (proc_file);
 	return (ret);
 }
 
@@ -165,6 +177,8 @@ ssize_t readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz)
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
 	ret = readlink(proc_file, buf, bufsiz);
+        if (proc_file != proc_buf)
+          free (proc_file);
 	return (ret);
 }
 
@@ -186,6 +200,8 @@ int fstatat(int dirfd, const char *pathname, struct stat *buf,
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
 	ret = stat(proc_file, buf);
+        if (proc_file != proc_buf)
+          free (proc_file);
 	return (ret);
 }
 
@@ -406,6 +422,8 @@ int utimensat(int dirfd, const char *pathname,
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
 	ret = utimens(proc_file, times);
+        if (proc_file != proc_buf)
+          free (proc_file);
 	return (ret);
 }
 
