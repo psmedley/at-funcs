@@ -441,6 +441,22 @@ futimens (int fd, struct timespec const times[2])
   return fdutimens (fd, NULL, times);
 }
 
+int
+fchmodat (int dirfd, char const *pathname, mode_t mode, int flags)
+{
+	int error, ret;
+
+	if (dirfd == AT_FDCWD || pathname[0]=='/' || pathname[1]==':')
+		return chmod(pathname, mode);
+
+	char proc_buf[OPENAT_BUFFER_SIZE];
+	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
+	ret = chmod(proc_file, mode);
+        if (proc_file != proc_buf)
+          free (proc_file);
+	return (ret);
+}
+
 #if 0
 int main() {
 	int dirfd = open("e:/website", 0);
