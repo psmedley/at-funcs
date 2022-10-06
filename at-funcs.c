@@ -101,14 +101,14 @@ unlinkat(int dirfd, const char *pathname, int flags)
 
 	char proc_buf[OPENAT_BUFFER_SIZE];
 	char *proc_file = openat_proc_name (proc_buf, dirfd, pathname);
-        if (proc_file != proc_buf)
-          free (proc_file);
-
 
 	if (flags == AT_REMOVEDIR)
 		ret = rmdir(proc_file);
 	else
 		ret = unlink(proc_file);
+
+        if (proc_file != proc_buf)
+          free (proc_file);
 
 	return (ret);
 }
